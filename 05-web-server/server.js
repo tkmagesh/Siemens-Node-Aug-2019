@@ -1,5 +1,6 @@
 var http = require('http'),
-	fs = require('fs');
+	fs = require('fs'),
+	path = require('path');
 
 /*
 	req - IncomingMessage (ReadableStream)
@@ -10,18 +11,15 @@ var server = http.createServer(function(req, res){
 	/*var fileContents = fs.readFileSync('index.html', { encoding : 'utf8'});
 	res.write(fileContents);
 	res.end();*/
-
-	var stream = fs.createReadStream('index.html');
-	stream.on('data', function(chunk){
-		res.write(chunk);
-	});
-	stream.on('end', function(){
+	var resourceName = req.url === '/' ? '/index.html' : req.url;
+	console.log(req.method + '\t' + req.url);
+	var resourceFullName = path.join(__dirname, resourceName);
+	if (!fs.existsSync(resourceFullName)){
+		res.statusCode = 404;
 		res.end();
-	});
-	stream.on('error', function(){
-		res.statusCode = 500;
-		res.end();
-	});
+		return;
+	}
+	fs.createReadStream(resourceFullName).pipe(res);
 });
 
 server.listen(8080);
