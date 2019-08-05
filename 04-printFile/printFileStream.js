@@ -3,6 +3,7 @@ var fs = require('fs');
 var stream = fs.createReadStream('sample.txt', { encoding : 'utf8'});
 
 //events -> open, data, end, close, error
+/*
 var readCount = 0;
 
 stream.on('data', function(chunk){
@@ -18,4 +19,7 @@ stream.on('end', function(){
 stream.on('error', function(err){
 	console.log(err);
 });
+*/
+
+stream.pipe(process.stdout);
 
