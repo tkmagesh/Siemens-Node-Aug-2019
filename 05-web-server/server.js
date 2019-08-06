@@ -1,6 +1,7 @@
 var http = require('http'),
 	fs = require('fs'),
-	path = require('path');
+	path = require('path'),
+	url = require('url');
 
 /*
 	req - IncomingMessage (ReadableStream)
@@ -8,10 +9,8 @@ var http = require('http'),
 
 */
 var server = http.createServer(function(req, res){
-	/*var fileContents = fs.readFileSync('index.html', { encoding : 'utf8'});
-	res.write(fileContents);
-	res.end();*/
-	var resourceName = req.url === '/' ? '/index.html' : req.url;
+	var urlObj = url.parse(req.url);
+	var resourceName = urlObj.pathname === '/' ? '/index.html' : urlObj.pathname;
 	console.log(req.method + '\t' + req.url);
 	var resourceFullName = path.join(__dirname, resourceName);
 	if (!fs.existsSync(resourceFullName)){
