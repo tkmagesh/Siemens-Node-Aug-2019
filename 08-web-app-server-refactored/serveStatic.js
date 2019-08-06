@@ -18,7 +18,7 @@ module.exports = function(req, res, next){
 			res.end();
 			return;
 		}
-		var stream = fs.createReadStream(resourceFullName);
+		/*var stream = fs.createReadStream(resourceFullName);
 		stream.on('data', function(chunk){
 			console.log('[@serveStatic] serving chunk');
 			res.write(chunk);
@@ -27,11 +27,14 @@ module.exports = function(req, res, next){
 			console.log('[@serveStatic] ending response');
 			res.end();
 			next();
-		});
+		});*/
 
-		/*var fileContents = fs.readFileSync(resourceFullName);
-		res.write(fileContents);
-		res.end();*/
+		var stream = fs.createReadStream(resourceFullName);
+		stream.pipe(res);
+		stream.on('end', function(){
+			next();
+		});
+		
 	} else {
 		next();
 	}
