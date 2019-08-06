@@ -1,6 +1,6 @@
 var fs = require('fs'),
 	path = require('path');
-	
+
 var staticExtns =['.html', '.css', '.js', '.jpg', '.png', '.ico', '.xml', '.txt', '.json'];
 
 function isStatic(resourceName){
@@ -8,7 +8,7 @@ function isStatic(resourceName){
 	return staticExtns.indexOf(resExtn) >= 0;
 }
 
-module.exports = function(req, res){
+module.exports = function(req, res, next){
 	var resourceName = req.urlObj.pathname === '/' ? '/index.html' : req.urlObj.pathname;
 	
 	if (isStatic(resourceName)){
@@ -18,6 +18,21 @@ module.exports = function(req, res){
 			res.end();
 			return;
 		}
-		fs.createReadStream(resourceFullName).pipe(res);
+		var stream = fs.createReadStream(resourceFullName);
+		stream.on('data', function(chunk){
+			console.log('[@serveStatic] serving chunk');
+			res.write(chunk);
+		});
+		stream.on('end', function(){
+			console.log('[@serveStatic] ending response');
+			res.end();
+			next();
+		});
+
+		/*var fileContents = fs.readFileSync(resourceFullName);
+		res.write(fileContents);
+		res.end();*/
+	} else {
+		next();
 	}
 }
