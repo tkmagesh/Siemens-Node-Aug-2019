@@ -10,14 +10,31 @@ var server = http.createServer(function(req, res){
 		res.end();
 		return;
 	}
-	var queryData = querystring.parse(urlObj.query),
-		op = queryData.op,
-		x = parseInt(queryData.x),
-		y = parseInt(queryData.y),
-		result = calculator[op](x,y);
+	if (req.method === 'GET'){
+		var queryData = querystring.parse(urlObj.query),
+			op = queryData.op,
+			x = parseInt(queryData.x),
+			y = parseInt(queryData.y),
+			result = calculator[op](x,y);
 
-	res.write(result.toString());
-	res.end();
+		res.write(result.toString());
+		res.end();
+	} else {
+		var rawData = '';
+		req.on('data', function(chunk){
+			rawData += chunk;
+		});
+		req.on('end', function(){
+			var bodyData = querystring.parse(rawData),
+				op = bodyData.op,
+				x = parseInt(bodyData.x),
+				y = parseInt(bodyData.y),
+				result = calculator[op](x,y);
+
+			res.write(result.toString());
+			res.end();
+		});
+	}
 });
 
 server.listen(8085);
