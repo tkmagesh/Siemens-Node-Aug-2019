@@ -1,18 +1,15 @@
 const express = require('express'),
-	router = express.Router();
+	router = express.Router(),
+	taskService = require('../services/taskService');
 
-const taskList = [
-	{id : 1, name : 'Learn JavaScript', isCompleted : false},
-	{id : 2, name : 'Explore Bangalore', isCompleted : true},
-	{id : 3, name : 'Plan the weekend', isCompleted : false}
-]
 router.get('/', function(req, res, next){
+	const taskList = taskService.getAll();
 	res.json(taskList);
 });
 
 router.get('/:id', function(req, res, next){
 	const taskId = parseInt(req.params.id);
-	const result = taskList.find(task => task.id === taskId);
+	const result = taskService.get(taskId);
 	if (result){
 		res.json(result); 
 	} else {
@@ -21,10 +18,8 @@ router.get('/:id', function(req, res, next){
 });
 
 router.post('/', function(req, res, next){
-	const taskData = req.body,
-		newTaskId = taskList.reduce((result, task) => result > task.id ? result : task.id, 0) + 1;
-	const newTask = { ...taskData, id : newTaskId}
-	taskList.push(newTask);
+	const taskData = req.body;
+	const newTask = taskService.addNew(taskData);
 	res.status(201).json(newTask);
 });
 
