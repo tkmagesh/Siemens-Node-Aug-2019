@@ -3,7 +3,7 @@ const path = require('path'),
 
 const dataFile = path.join(__dirname, '../data/taskDb.json');
 
-function readData(callback){
+/*function readData(callback){
 	fs.readFile(dataFile, {encoding : 'utf8'}, function(err, rawData){
 		callback(JSON.parse(rawData));
 	});
@@ -11,6 +11,33 @@ function readData(callback){
 
 function saveData(dataToWrite, callback){
 	fs.writeFile(dataFile, JSON.stringify(dataToWrite), callback);
+}
+*/
+
+function readData(){
+	var p = new Promise(function(resolveFn, rejectFn){
+		fs.readFile(dataFile, {encoding : 'utf8'}, function(err, rawData){
+			if (err){
+				rejectFn(err);
+			} else {
+				resolveFn(JSON.parse(rawData));	
+			}
+		});	
+	})
+	return p;
+}
+
+function saveData(dataToWrite){
+	var p = new Promise(function(resolveFn, rejectFn){
+		fs.writeFile(dataFile, JSON.stringify(dataToWrite), function(err, result){
+			if (err){
+				rejectFn(err);
+			} else {
+				resolveFn(result);	
+			}
+		});
+	});
+	return p;
 }
 
 module.exports = { readData, saveData };

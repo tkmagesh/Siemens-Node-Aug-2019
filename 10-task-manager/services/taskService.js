@@ -1,28 +1,31 @@
 const taskDb = require('./taskDb');
 
 function getAll(callback){
-	taskDb.readData(function(taskList){
-		callback([...taskList]);	
-	});
-	
+	return taskDb.readData();	
 }
 
 function get(id, callback){
-	taskDb.readData(function(taskList){
-		const result = taskList.find(task => task.id === taskId);
-		callback(result);
-	});
+	return taskDb
+		.readData()
+		.then(function(taskList){
+			const result = taskList.find(task => task.id === taskId);
+			return result;
+		});
 }
 
 function addNew(taskData, callback){
-	taskDb.readData(function(taskList){
-		const newTaskId = taskList.reduce((result, task) => result > task.id ? result : task.id, 0) + 1;
-		const newTask = { ...taskData, id : newTaskId}
-		taskList.push(newTask);
-		taskDb.saveData(taskList, function(){
-			callback(newTask);
+	return taskDb
+		.readData()
+		.then(function(taskList){
+			const newTaskId = taskList.reduce((result, task) => result > task.id ? result : task.id, 0) + 1;
+			const newTask = { ...taskData, id : newTaskId}
+			taskList.push(newTask);
+			return taskDb
+				.saveData(taskList)
+				.then(function(){
+					return newTask;
+				});
 		});
-	});
 }
 
 const taskService = { 
